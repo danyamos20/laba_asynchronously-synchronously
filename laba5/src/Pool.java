@@ -51,20 +51,28 @@ public class Pool {
     // ------------------------------------------------------- єдиний TODO
 
     /** Виконати всі REQUESTS запитів на пулі розміром size. Повертає витрачений час у мс. */
+
     static long runOnPool(int size, CountingFactory factory) throws Exception {
-        // TODO [П5]: близько 12 рядків.
-        //   1) ExecutorService pool = Executors.newFixedThreadPool(size, factory);
-        //      фабрику передати обов'язково, інакше колонка «створено» буде нульова;
-        //   2) заміряти час: long t0 = System.currentTimeMillis();
-        //   3) на кожен шлях "/сторінка/" + i покласти в пул задачу
-        //      pool.submit(() -> fetch(path)) і зібрати всі Future у список;
-        //   4) окремим циклом забрати результати через future.get();
-        //      спершу всі submit, і тільки потім усі get, інакше задачі підуть по черзі;
-        //   5) pool.shutdown() і pool.awaitTermination(5, TimeUnit.SECONDS);
-        //      без shutdown потоки пула лишаються живі, і JVM не завершується;
-        //   6) повернути System.currentTimeMillis() - t0.
-        return 0;
+        ExecutorService pool = Executors.newFixedThreadPool(size, factory); // Створюємо пул потоків
+        long t0 = System.currentTimeMillis(); // Запам'ятовуємо час початку
+
+        List<Future<String>> futures = new ArrayList<>();
+
+        for (int i = 0; i < REQUESTS; i++) {
+            final String path = "/сторінка/" + i; // Формуємо шлях запиту
+            futures.add(pool.submit(() -> fetch(path))); // Додаємо задачу до пулу
+        }
+
+        for (Future<String> future : futures) {
+            future.get(); // Очікуємо завершення кожної задачі
+        }
+
+        pool.shutdown(); // Завершуємо роботу пулу
+        pool.awaitTermination(5, TimeUnit.SECONDS); // Чекаємо завершення потоків
+
+        return System.currentTimeMillis() - t0; // Повертаємо час виконання
     }
+
 
     // ---------------------------------------------------------- дано нижче
 
