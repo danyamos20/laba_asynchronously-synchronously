@@ -13,6 +13,8 @@
       <sourceFolder url="file://$MODULE_DIR$/laba4/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/laba5" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/laba5/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/laba6" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/laba6/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -61,17 +61,30 @@ public class ProductPage {
     // ------------------------------------------------------- єдиний TODO
 
     /** Зібрати сторінку. Зразок того самого патерну на двох джерелах лежить у demoTwo(). */
+
     static Page load(int id) {
-        // TODO [П6]: близько 12 рядків.
-        //   1) три гілки, кожна на нашому пулі:
-        //      CompletableFuture.supplyAsync(() -> product(id), POOL), так само ціна і наявність;
-        //   2) на кожній гілці своя заглушка: .exceptionally(e -> NO_PRODUCT), NO_PRICE, NO_STOCK.
-        //      Саме на гілці, а не на зібраній сторінці: одне зламане джерело
-        //      не має права замінити заглушками всі три поля;
-        //   3) одне очікування на всі три: CompletableFuture.allOf(a, b, c).join();
-        //   4) зібрати new Page(a.join(), b.join(), c.join()); після allOf гілки вже готові.
-        return null;
+        // Запускаємо завантаження опису
+        CompletableFuture<String> a = CompletableFuture
+                .supplyAsync(() -> product(id), POOL)
+                .exceptionally(e -> NO_PRODUCT);
+
+        // Запускаємо завантаження ціни
+        CompletableFuture<String> b = CompletableFuture
+                .supplyAsync(() -> price(id), POOL)
+                .exceptionally(e -> NO_PRICE);
+
+        // Запускаємо завантаження наявності
+        CompletableFuture<String> c = CompletableFuture
+                .supplyAsync(() -> stock(id), POOL)
+                .exceptionally(e -> NO_STOCK);
+
+        // Очікуємо завершення всіх трьох задач
+        CompletableFuture.allOf(a, b, c).join();
+
+        // Об'єднуємо результати в одну сторінку
+        return new Page(a.join(), b.join(), c.join());
     }
+
 
     // ---------------------------------------------------------- дано нижче
 
